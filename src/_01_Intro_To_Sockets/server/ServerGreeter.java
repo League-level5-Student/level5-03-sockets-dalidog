@@ -1,11 +1,14 @@
 package _01_Intro_To_Sockets.server;
 
 import java.net.*;
+
+import javax.swing.JOptionPane;
+
 import java.io.*;
 
 public class ServerGreeter extends Thread {
 	//1. Create an object of the ServerSocket class
-
+ServerSocket ss = new ServerSocket();
 	public ServerGreeter() throws IOException {
 		//2. Initialize the ServerSocket object. In the parameters,
 		//   you must define the port at which the server will listen for connections.
@@ -15,6 +18,26 @@ public class ServerGreeter extends Thread {
 	}
 
 	public void run() {
+		boolean x = true;
+		while(x==true) {
+			try {
+				JOptionPane.showMessageDialog(null, "The server is waiting for a client to connect");
+				Socket s2 = ss.accept();
+				JOptionPane.showMessageDialog(null, "The client has connected");
+				DataInputStream dis=new DataInputStream(s2.getInputStream());
+				System.out.println(dis.readUTF());
+				DataOutputStream dos=new DataOutputStream(s2.getOutputStream());
+				dos.writeUTF("yo");
+				s2.close();
+			} catch (SocketTimeoutException e) {
+				// TODO: handle exception
+				JOptionPane.showMessageDialog(null, "Caught a SocketTimeoutException!");
+				x=false;
+			} catch(IOException f) {
+				JOptionPane.showMessageDialog(null, "Caught an IOException!");
+				x=false;
+			}
+		}
 		//3. Create a boolean variable and initialize it to true.
 		
 		//4. Make a while loop that continues looping as long as the boolean created in the previous step is true.
@@ -26,7 +49,7 @@ public class ServerGreeter extends Thread {
 		
 				//9. Create an object of the Socket class and initialize it to serverSocket.accept();
 				//   Change serverSocket to match the ServerSocket member variable you created in step 1.
-				//   The program will wait her until either a client connects or the timeout expires.
+				//   The program will wait here until either a client connects or the timeout expires.
 
 				//10. Let the user know that the client has connected.
 				
@@ -49,6 +72,14 @@ public class ServerGreeter extends Thread {
 
 	public static void main(String[] args) {
 		//16. In a new thread, create an object of the ServerGreeter class and start the thread. Don't forget the try-catch.
-		
+		Thread t = new Thread(()->{
+			try {
+				ServerGreeter sg = new ServerGreeter();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		});
+		t.start();
 	}
 }
